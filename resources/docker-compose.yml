@@ -128,6 +128,8 @@ services:
       - 5432:5432
     volumes:
       - ./volumes/orderbook_data:/var/lib/postgresql/data
+    networks:
+      - merry
 
   redis:
     image: redis:alpine
