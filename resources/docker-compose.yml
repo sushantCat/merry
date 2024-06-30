@@ -1,20 +1,25 @@
+version: '3.8'
+
+networks:
+  merry:
+    driver: bridge
+
 services:
-  # RPC daemon
   bitcoin:
     image: lncm/bitcoind:v24.0.1
     container_name: bitcoin
-    # wildcard user 0:0 to avoid permission problems
     user: 0:0
     restart: on-failure
     stop_grace_period: 30s
     ports:
       - 18443:18443
       - 18444:18444
-      # ZMQ
       - 28332:28332
       - 28333:28333
     volumes:
       - ./volumes/bitcoin:/root/.bitcoin
+    networks:
+      - merry
 
   arbitrum:
     image: ghcr.io/catalogfi/garden_sol:latest
@@ -24,16 +29,20 @@ services:
       LIGHT: "false"
     ports:
       - 8546:8545
-  
+    networks:
+      - merry
+
   arbitrum-explorer:
     image: otterscan/otterscan:latest
     container_name: arbitrum-explorer
     depends_on:
       - arbitrum
     environment:
-      ERIGON_URL: http://localhost:8546
+      ERIGON_URL: http://arbitrum:8546
     ports:
       - 5101:80
+    networks:
+      - merry
 
   ethereum:
     image: ghcr.io/catalogfi/garden_sol:latest
@@ -43,6 +52,8 @@ services:
       LIGHT: "true"
     ports:
       - 8545:8545
+    networks:
+      - merry
 
   ethereum-explorer:
     image: otterscan/otterscan:latest
@@ -51,8 +62,9 @@ services:
       - ethereum
     ports:
       - 5100:80
+    networks:
+      - merry
 
-  # Block explorer server
   electrs:
     image: ghcr.io/vulpemventures/electrs:latest
     container_name: electrs
@@ -83,20 +95,22 @@ services:
     volumes:
       - ./volumes/bitcoin/:/config
     restart: unless-stopped
+    networks:
+      - merry
 
-  # Block explorer frontend
   esplora:
     image: ghcr.io/vulpemventures/esplora:latest
     container_name: esplora
     depends_on:
       - chopsticks
     environment:
-      API_URL: http://localhost:3000
+      API_URL: http://chopsticks:3000
     ports:
       - 5050:5000
     restart: unless-stopped
+    networks:
+      - merry
 
-  # Chopsticks
   chopsticks:
     image: ghcr.io/vulpemventures/nigiri-chopsticks:latest
     container_name: chopsticks
@@ -116,6 +130,8 @@ services:
     ports:
       - 3000:3000
     restart: unless-stopped
+    networks:
+      - merry
   
   postgres:
     image: postgres:alpine
@@ -138,6 +154,8 @@ services:
       - 6379:6379
     volumes:
       - ./volumes/cobi_data:/data
+    networks:
+      - merry
 
   orderbook:
     image: ghcr.io/catalogfi/orderbook:latest
@@ -150,6 +168,8 @@ services:
     ports:
       - 8080:8080
     restart: unless-stopped
+    networks:
+      - merry
 
   cobi:
     image: ghcr.io/catalogfi/cobi:latest
@@ -158,7 +178,6 @@ services:
       - orderbook
       - redis
     restart: unless-stopped
+    networks:
+      - merry
 
-networks:
-  default:
-    name: merry
