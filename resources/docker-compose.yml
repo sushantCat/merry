@@ -16,6 +16,7 @@ services:
     volumes:
       - ./volumes/bitcoin:/root/.bitcoin
 
+
   arbitrum:
     image: ghcr.io/catalogfi/garden_sol:latest
     container_name: arbitrum
