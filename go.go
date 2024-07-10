@@ -37,6 +37,7 @@ func (m *Merry) Start() error {
 
 	fmt.Println()
 	fmt.Println("ENDPOINTS")
+	fmt.Println(m.Services)
 	for name, endpoint := range m.Services {
 		if m.IsBare {
 			if name == "cobi" || name == "redis" || name == "orderbook" || name == "postgres" {
