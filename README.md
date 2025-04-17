@@ -124,7 +124,7 @@ Let Merry simplify your multi-chain testing journey!
 git clone https://github.com/catalogfi/merry.git
 ```
 
-- Building and installing
+- Building and installin
 
 ```bash
 cd cmd/merry
